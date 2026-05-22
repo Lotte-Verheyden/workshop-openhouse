@@ -28,3 +28,5 @@ The full visual walkthrough lives in [**`evaluators/database-grounded/setup.md`*
 | Name | Purpose |
 |---|---|
 | [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions for stressing scope adherence in experiments. Pairs with the `on-topic` evaluator. |
+
+Upload walkthrough: [`datasets/setup.md`](./datasets/setup.md).
