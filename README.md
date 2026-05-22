@@ -22,3 +22,9 @@ The full visual walkthrough lives in [**`evaluators/database-grounded/setup.md`*
 ## Pairing
 
 `database-grounded` × `on-topic` together surface the highest-value failure case: questions the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](./evaluators/on-topic/setup.md) for the full pairing table.
+
+## Datasets
+
+| Name | Purpose |
+|---|---|
+| [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions for stressing scope adherence in experiments. Pairs with the `on-topic` evaluator. |
