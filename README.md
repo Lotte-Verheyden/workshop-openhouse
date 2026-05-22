@@ -9,6 +9,7 @@ LLM-as-a-judge evaluators for the LibreChat ClickHouse MCP agent, built for a La
 | [`database-grounded`](./evaluators/database-grounded/) | Hallucinated specifics — confident numbers with no DB tool call | ✅ | ❌ |
 | [`user-sentiment`](./evaluators/user-sentiment/) | Frustration, confusion, pushback in the user's messages | ✅ | ❌ |
 | [`on-topic`](./evaluators/on-topic/) | Scope drift — agent answering questions outside its remit instead of deferring | ✅ | ✅ |
+| [`deferred-the-question`](./evaluators/deferred-the-question/) | Boolean: did the agent refuse / redirect the off-topic question, or attempt to answer? | ❌ | ✅ |
 
 Each folder contains:
 
@@ -27,6 +28,6 @@ The full visual walkthrough lives in [**`evaluators/database-grounded/setup.md`*
 
 | Name | Purpose |
 |---|---|
-| [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions for stressing scope adherence in experiments. Pairs with the `on-topic` evaluator. |
+| [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions for stressing scope adherence in experiments. Pairs with the `on-topic` and `deferred-the-question` evaluators. |
 
 Upload walkthrough: [`datasets/setup.md`](./datasets/setup.md).
