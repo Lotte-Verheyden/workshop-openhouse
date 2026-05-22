@@ -17,28 +17,72 @@ Categorical with three labels:
 | 1 | `neutral` |
 | 0 | `negative` |
 
-## Steps in the Langfuse UI
+---
 
-1. **Settings → LLM Connections** — add an LLM API key if one isn't configured yet.
-2. **Evaluators → + Set up evaluator → Custom evaluator**
-3. **Name:** `user-sentiment`
-4. **Score type:** Categorical → select existing score config `user-sentiment`
-5. **Prompt:** paste from [`prompt.md`](./prompt.md)
-6. **Target:** Live Traces
-7. **Filter:** `Trace name = AgentRun`
-8. **Sampling:** 100%
-9. **Backfill:** on (if you want to score existing traces)
-10. **Variable mapping:**
+## Visual walkthrough
+
+> Same 8 steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Only the name, prompt, and category labels change. Walkthrough below shows just the screens you'll see for this one.
+
+### 1. Open LLM-as-a-Judge → + Set up evaluator
+
+![Set up evaluator](../../images/user-sentiment-01-set-up-evaluator.png)
+
+### 2. Create a new custom evaluator
+
+`database-grounded` is in the list now — click **+ Create Custom Evaluator** to add this one.
+
+![Select evaluator → Create Custom](../../images/user-sentiment-02-select-evaluator.png)
+
+### 3. Name and prompt
+
+- **Name:** `user-sentiment`
+- **Prompt:** paste from [`prompt.md`](./prompt.md)
+
+![Create evaluator form](../../images/user-sentiment-03-create-form.png)
+
+### 4. Score type and categories
+
+- **Score type:** Categorical
+- **Categories:** `positive`, `neutral`, `negative`
+- **Score reasoning prompt** (optional):
+
+  ```
+  In one sentence, point to the strongest sentiment signal in the user's messages.
+  ```
+
+![Categories: positive / neutral / negative](../../images/user-sentiment-04-categories.png)
+
+### 5. Skip Experiments — pick Traces
+
+The wizard offers **Experiments** as a target. **Skip it for this evaluator.** An experiment has no real user reacting — there's no sentiment to score.
+
+![Experiments tab — don't pick this](../../images/user-sentiment-05-experiments-tab.png)
+
+### 6. Run on Traces
+
+**Traces (Legacy)**, **New traces** + **Existing traces** both checked.
+
+![Run on Traces](../../images/user-sentiment-06-run-on-traces.png)
+
+### 7. Filter, sampling, delay
+
+- **Filter:** `Name = any of → AgentRun`
+- **Sampling:** 100%
+- **Delay:** 30s (default)
+
+![Filter and sampling](../../images/user-sentiment-07-filter-sampling.png)
+
+### 8. Variable mapping
 
 | Variable | Source | Field |
 |---|---|---|
 | `conversation` | Trace | `output` |
 
-11. **Reasoning prompt (optional):**
+The Langfuse UI also shows a live preview of the prompt with one matched trace's data filled in — useful sanity check before saving.
 
-```
-In one sentence, point to the strongest sentiment signal in the user's messages.
-```
+![Variable mapping with prompt preview](../../images/user-sentiment-08-variable-mapping.png)
+
+---
 
 ## Note on multi-turn traces
 
