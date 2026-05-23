@@ -51,6 +51,4 @@ One evaluator and one experiment-run flow. Together they let you iterate the age
 |---|---|
 | [`deferred-the-question`](./offline-experiment/deferred-the-question/) | Boolean: did the agent refuse / redirect the off-topic question, or attempt to answer? |
 
-Evaluator setup: [`offline-experiment/deferred-the-question/setup.md`](./offline-experiment/deferred-the-question/setup.md).
-
-Experiment run setup (running an experiment + reading the scores chart): [`offline-experiment/setup.md`](./offline-experiment/setup.md).
+**Start here:** [`offline-experiment/setup.md`](./offline-experiment/setup.md) walks the full flow — setting up the evaluator, running the experiment against the dataset, and reading the resulting scores chart. The evaluator's own page ([`deferred-the-question/setup.md`](./offline-experiment/deferred-the-question/setup.md)) covers the per-evaluator setup details and is linked from step 1.
