@@ -5,7 +5,7 @@ How to run an experiment in Langfuse against the [`out-of-scope-questions`](../d
 Prerequisites:
 
 - [`out-of-scope-questions`](../datasets/setup.md) dataset uploaded
-- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version)
+- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version). For a simple starting point, the prompt can just contain `{{conversation}}` as its only variable — the dataset item's input fills it in at run time.
 
 ## 1. Set up the evaluator
 
