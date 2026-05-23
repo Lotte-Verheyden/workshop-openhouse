@@ -7,18 +7,6 @@ Judges whether the user's question is something the ClickHouse MCP agent should 
 - **Live monitoring:** ✅
 - **Offline experiments:** ✅ (only needs the question and the response, both available in any experiment trace)
 
-## Score config
-
-Categorical with three labels:
-
-| Value | Label |
-|---|---|
-| 2 | `on_topic` |
-| 1 | `ambiguous` |
-| 0 | `off_topic` |
-
----
-
 ## Visual walkthrough
 
 > Same 8 steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Only the name, prompt, and category labels change. Walkthrough below shows just the screens you'll see for this one.

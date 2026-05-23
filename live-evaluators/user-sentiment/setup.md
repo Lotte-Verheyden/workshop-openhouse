@@ -7,18 +7,6 @@ Reads the user's messages and labels their emotional state. Catches frustration 
 - **Live monitoring:** ✅
 - **Offline experiments:** ❌ (no real user means no sentiment signal)
 
-## Score config
-
-Categorical with three labels:
-
-| Value | Label |
-|---|---|
-| 2 | `positive` |
-| 1 | `neutral` |
-| 0 | `negative` |
-
----
-
 ## Visual walkthrough
 
 > Same 8 steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Only the name, prompt, and category labels change. Walkthrough below shows just the screens you'll see for this one.

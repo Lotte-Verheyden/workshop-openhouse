@@ -7,18 +7,6 @@ Detects whether the agent answered using a real ClickHouse Cloud MCP tool call (
 - **Live monitoring:** ✅
 - **Offline experiments:** ❌ (requires live DB access during the run)
 
-## Score config
-
-Categorical with three labels:
-
-| Value | Label |
-|---|---|
-| 2 | `grounded` |
-| 1 | `no_data_required` |
-| 0 | `potentially_hallucinated` |
-
----
-
 ## Visual walkthrough
 
 > The flow below is the canonical setup for this repo. `user-sentiment` and `on-topic` follow the exact same steps — only the **name**, the **prompt** (paste from each folder's `prompt.md`), and the **category labels** change. The pasteable values for each are in the respective `setup.md`.

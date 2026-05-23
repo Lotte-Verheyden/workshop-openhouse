@@ -7,17 +7,6 @@ Boolean evaluator that checks whether the agent refused / redirected an off-topi
 - **Live monitoring:** ❌ (this evaluator assumes every input is off-topic — only true for the scope-stress dataset)
 - **Offline experiments:** ✅ — run on the `out-of-scope-questions` dataset
 
-## Score config
-
-Boolean:
-
-| Value | Meaning |
-|---|---|
-| `true` | agent deferred / refused / redirected |
-| `false` | agent attempted to answer the off-topic question |
-
----
-
 ## Visual walkthrough
 
 > Same first two steps as [`database-grounded/setup.md`](../../live-evaluators/database-grounded/setup.md). Differences for this one: **score type = Boolean**, **target = Experiments**, **two variables** instead of one.
@@ -37,7 +26,7 @@ Click **+ Create Custom Evaluator**.
 ### 3. Name, prompt, score type
 
 - **Name:** `deferred-the-question`
-- **Prompt:** paste from [`prompt.md`](./prompt.md) — note it has **two** variables, `{{question}}` and `{{response}}`
+- **Prompt:** paste from [`evaluator-prompt.md`](./evaluator-prompt.md) — note it has **two** variables, `{{question}}` and `{{response}}`
 - **Score type:** **Boolean** (not Categorical)
 - **Score reasoning prompt** (optional):
 
