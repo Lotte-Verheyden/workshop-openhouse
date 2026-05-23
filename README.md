@@ -53,4 +53,4 @@ One evaluator and one experiment-run flow. Together they let you iterate the age
 
 Evaluator setup: [`offline-experiment/deferred-the-question/setup.md`](./offline-experiment/deferred-the-question/setup.md).
 
-Experiment run setup: _coming next_ (screenshots TBD).
+Experiment run setup (running an experiment + reading the scores chart): [`offline-experiment/setup.md`](./offline-experiment/setup.md).
