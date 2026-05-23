@@ -1,33 +1,56 @@
 # langfuse-evaluators
 
-LLM-as-a-judge evaluators for the LibreChat ClickHouse MCP agent, built for a Langfuse workshop.
+LLM-as-a-judge evaluators and supporting material for the LibreChat ClickHouse MCP agent, built for a Langfuse workshop.
 
-## Evaluators
+The repo follows the same three-step arc as the workshop:
 
-| Name | What it catches | Live | Offline |
-|---|---|---|---|
-| [`database-grounded`](./evaluators/database-grounded/) | Hallucinated specifics — confident numbers with no DB tool call | ✅ | ❌ |
-| [`user-sentiment`](./evaluators/user-sentiment/) | Frustration, confusion, pushback in the user's messages | ✅ | ❌ |
-| [`on-topic`](./evaluators/on-topic/) | Scope drift — agent answering questions outside its remit instead of deferring | ✅ | ✅ |
-| [`deferred-the-question`](./evaluators/deferred-the-question/) | Boolean: did the agent refuse / redirect the off-topic question, or attempt to answer? | ❌ | ✅ |
+1. [Set up live evaluators (monitoring)](#1-set-up-live-evaluators-monitoring)
+2. [Set up the dataset](#2-set-up-the-dataset)
+3. [Set up the offline experiment](#3-set-up-the-offline-experiment-evaluator--experiment-run)
+
+---
+
+## 1. Set up live evaluators (monitoring)
+
+Three LLM-as-a-judge evaluators that run on every new live agent trace. Each one targets a different failure mode.
+
+| Name | What it catches |
+|---|---|
+| [`database-grounded`](./live-evaluators/database-grounded/) | Hallucinated specifics — confident numbers with no DB tool call |
+| [`user-sentiment`](./live-evaluators/user-sentiment/) | Frustration, confusion, pushback in the user's messages |
+| [`on-topic`](./live-evaluators/on-topic/) | Scope drift — agent answering questions outside its remit instead of deferring |
 
 Each folder contains:
 
 - `prompt.md` — the evaluator prompt (paste into Langfuse)
 - `setup.md` — UI configuration steps
 
-## How to set one up
+**Start here:** [`live-evaluators/database-grounded/setup.md`](./live-evaluators/database-grounded/setup.md) has the full visual walkthrough. The other two evaluators follow the same flow — only name, prompt, and category labels change. Their `setup.md` files document those per-evaluator deltas.
 
-The full visual walkthrough lives in [**`evaluators/database-grounded/setup.md`**](./evaluators/database-grounded/setup.md) — screenshots of every step in the Langfuse UI. The other two evaluators follow the exact same steps; only the name, prompt, and category labels change. Their `setup.md` files document those per-evaluator values.
+**Pairing:** `database-grounded` × `on-topic` together surface the highest-value failure case — questions the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](./live-evaluators/on-topic/setup.md) for the full pairing table.
 
-## Pairing
+---
 
-`database-grounded` × `on-topic` together surface the highest-value failure case: questions the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](./evaluators/on-topic/setup.md) for the full pairing table.
+## 2. Set up the dataset
 
-## Datasets
+A single dataset of off-topic user questions, used to stress-test the agent's scope adherence in offline experiments.
 
 | Name | Purpose |
 |---|---|
-| [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions for stressing scope adherence in experiments. Pairs with the `on-topic` and `deferred-the-question` evaluators. |
+| [`out-of-scope-questions.csv`](./datasets/out-of-scope-questions.csv) | 15 off-topic user questions. Pairs with the offline `deferred-the-question` evaluator. |
 
 Upload walkthrough: [`datasets/setup.md`](./datasets/setup.md).
+
+---
+
+## 3. Set up the offline experiment (evaluator + experiment run)
+
+One evaluator and one experiment-run flow. Together they let you iterate the agent's system prompt against the dataset until refusal behavior is good enough to ship.
+
+| Name | What it catches |
+|---|---|
+| [`deferred-the-question`](./offline-experiment/deferred-the-question/) | Boolean: did the agent refuse / redirect the off-topic question, or attempt to answer? |
+
+Evaluator setup: [`offline-experiment/deferred-the-question/setup.md`](./offline-experiment/deferred-the-question/setup.md).
+
+Experiment run setup: _coming next_ (screenshots TBD).

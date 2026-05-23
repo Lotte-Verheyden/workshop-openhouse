@@ -20,7 +20,7 @@ Boolean:
 
 ## Visual walkthrough
 
-> Same first two steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Differences for this one: **score type = Boolean**, **target = Experiments**, **two variables** instead of one.
+> Same first two steps as [`database-grounded/setup.md`](../../live-evaluators/database-grounded/setup.md). Differences for this one: **score type = Boolean**, **target = Experiments**, **two variables** instead of one.
 
 ### 1. Open LLM-as-a-Judge → + Set up evaluator
 
@@ -86,4 +86,4 @@ Save the evaluator. It won't run on anything yet — experiment evaluators trigg
 5. If items score `false`, iterate the system prompt and rerun.
 6. Once every item scores `true`, that prompt is safe to ship back to the live agent.
 
-This is the only evaluator in this repo designed exclusively for experiments. The [`on-topic`](../on-topic/) evaluator works in both modes — use it for live monitoring; use `deferred-the-question` for the focused offline iteration loop.
+This is the only evaluator in this repo designed exclusively for experiments. The [`on-topic`](../../live-evaluators/on-topic/) evaluator works in both modes — use it for live monitoring; use `deferred-the-question` for the focused offline iteration loop.
