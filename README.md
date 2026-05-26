@@ -2,15 +2,26 @@
 
 LLM-as-a-judge evaluators and supporting material for the LibreChat ClickHouse MCP agent, built for a Langfuse workshop.
 
-The repo follows the same three-step arc as the workshop:
+The repo follows the same four-step arc as the workshop — the Langfuse [**AI Engineering Loop**](https://langfuse.com/academy/ai-engineering-loop):
 
-1. [Set up live evaluators (monitoring)](#1-set-up-live-evaluators-monitoring)
-2. [Set up the dataset](#2-set-up-the-dataset)
-3. [Set up the offline experiment](#3-set-up-the-offline-experiment-evaluator--experiment-run)
+1. [Trace](#1-trace)
+2. [Monitor](#2-monitor)
+3. [Build datasets](#3-build-datasets)
+4. [Experiment & Evaluate](#4-experiment--evaluate)
+
+Some steps point at content in this repo; others just describe what should already be in place before the next step.
 
 ---
 
-## 1. Set up live evaluators (monitoring)
+## 1. Trace
+
+Capture every agent request as a Langfuse trace: prompts, tool calls, generations, latency, cost.
+
+**Nothing in this repo.** Tracing has to be wired into your application directly. For the workshop, LibreChat is already configured to send traces to the Langfuse project — every agent turn shows up as an `AgentRun` trace. If you're setting up tracing from scratch, start with the [Langfuse tracing docs](https://langfuse.com/docs/observability/overview).
+
+---
+
+## 2. Monitor
 
 Three LLM-as-a-judge evaluators that run on every new live agent trace. Each one targets a different failure mode.
 
@@ -31,9 +42,9 @@ Each folder contains:
 
 ---
 
-## 2. Set up the dataset
+## 3. Build datasets
 
-A single dataset of off-topic user questions, used to stress-test the agent's scope adherence in offline experiments.
+A single dataset of off-topic user questions, used to stress-test the agent's scope adherence in the next step.
 
 | Name | Purpose |
 |---|---|
@@ -43,7 +54,7 @@ Upload walkthrough: [`datasets/setup.md`](./datasets/setup.md).
 
 ---
 
-## 3. Set up the offline experiment (evaluator + experiment run)
+## 4. Experiment & Evaluate
 
 One evaluator and one experiment-run flow. Together they let you iterate the agent's system prompt against the dataset until refusal behavior is good enough to ship.
 
