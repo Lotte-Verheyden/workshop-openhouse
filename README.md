@@ -1,4 +1,4 @@
-# langfuse-evaluators
+# OpenHouse Workshop
 
 LLM-as-a-judge evaluators and supporting material for the LibreChat ClickHouse MCP agent, built for a Langfuse workshop.
 
