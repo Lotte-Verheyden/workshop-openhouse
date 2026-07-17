@@ -11,17 +11,17 @@ Prerequisites:
 
 Create the `deferred-the-question` evaluator (boolean, target: Experiments). Full walkthrough in [`deferred-the-question/setup.md`](./deferred-the-question/setup.md). Come back here once it's saved.
 
-## 2. Open the dataset
+## 2. Open Experiments
 
-Sidebar → **Evaluation → Datasets** → click `out-of-scope-questions`.
+Sidebar → **Evaluation → Experiments**. (You now start an experiment from here — you'll pick the dataset inside the run modal in a later step.)
 
-![Sidebar: Datasets](../images/experiment-run-01-sidebar.png)
+![Sidebar: Experiments](../images/experiment-run-01-sidebar.png)
 
 ## 3. Run experiment
 
-Top right of the dataset page → **Run experiment**.
+Top right of the Experiments page → **Run experiment**.
 
-![Dataset header with Run experiment](../images/experiment-run-02-dataset-header.png)
+![Experiments header with Run experiment](../images/experiment-run-02-dataset-header.png)
 
 ## 4. Pick UI mode
 
