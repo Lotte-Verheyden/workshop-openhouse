@@ -2,92 +2,66 @@
 
 Detects whether the agent answered using a real ClickHouse Cloud MCP tool call (grounded) or fabricated specifics from background knowledge (hallucinated).
 
-> Prefer a deterministic check? [`database-grounded-code`](../database-grounded-code/) answers "did a ClickHouse tool run this turn?" with a code evaluator — no model, free, reproducible. Use this LLM version when you also want a semantic judgment of whether the response's claims are actually supported.
+"Did the agent actually query the database this turn?" is a structural fact — each tool call is recorded in the trace — so this is a **code evaluator**, not an LLM judge: a few lines of Python read the trace directly. It's deterministic, free, runs in milliseconds, and catches the case an LLM judge is weak on — a turn that answers a data question from **stale conversation history** without re-querying.
 
 ## Use
 
 - **Live monitoring:** ✅
-- **Offline experiments:** ❌ (requires live DB access during the run)
+- **Offline experiments:** ✅ (code evaluators run on experiment observations too)
+- **Requirements:** OTel-based SDK (LibreChat is on JS SDK v5 ✅). On **self-hosted** Langfuse, code evaluators need a configured [code-evaluator dispatcher](https://langfuse.com/self-hosting/configuration/code-evaluators); on Langfuse Cloud it's built in.
 
 ## Visual walkthrough
 
-> The flow below is the canonical setup for this repo. `user-sentiment` and `on-topic` follow the same steps — they differ only in the **name**, the **prompt** (paste from each folder's `prompt.md`), the **category labels**, and the **target observation** (`user-sentiment`/`on-topic` map the root `AgentRun` observation's `input`; this one maps the `LangGraph` span's `output`). The per-evaluator deltas are in the respective `setup.md`.
-
 ### 1. Open Evaluators
 
-Sidebar → **Evaluation → Evaluators**. (This section was previously labelled "LLM-as-a-Judge".)
+Sidebar → **Evaluation → Evaluators**.
 
 ![Sidebar: Evaluators](../../images/01-sidebar-llm-as-a-judge.png)
 
-### 2. Set up evaluator
+### 2. Set up evaluator → Code evaluator
 
-Click **+ Set up evaluator** (top right).
+Click **+ Set up evaluator**, then under **Create from scratch** pick **Code evaluator** (not LLM as a judge).
 
-![Evaluators page](../../images/02-set-up-evaluator.png)
+![Select Code evaluator](../../images/database-grounded-01-select-evaluator.png)
 
-### 3. Configure a default judge model (one-time)
-
-If no default model is set, the wizard blocks you here. Click **Set up** and add an LLM connection (any model with structured-output support — `gpt-4o-mini` and `claude-haiku-4-5` are cheap defaults).
-
-![Default model warning](../../images/03-default-model.png)
-
-### 4. Name and prompt
+### 3. Name and code
 
 - **Name:** `database-grounded`
-- **Prompt:** paste from [`prompt.md`](./prompt.md)
+- **Type:** `Python`
+- **Code:** paste from [`evaluator.py`](./evaluator.py)
 
-![Create evaluator form](../../images/04-create-evaluator-form.png)
+The evaluator finds the **last `user` message** and inspects only the messages after it — the current run. Earlier turns' tool calls are conversation history and are ignored, so a turn that answered from context isn't credited with an earlier turn's query. It returns a categorical score: `grounded` (a `run_select_query` ran this turn), `metadata_only` (only schema/listing tools ran), or `no_tool_call` (nothing ran — answered from history/background knowledge).
 
-### 5. Score type and categories
+![Create evaluator form with Python code](../../images/database-grounded-02-create-form.png)
 
-- **Score type:** Categorical
-- **Categories** (exact labels, in this order is fine):
-  - `potentially_hallucinated`
-  - `no_data_required`
-  - `grounded`
-- **Allow multiple matches:** off
-- **Score reasoning prompt:** leave default, or use:
+### 4. Run on Observations
 
-  ```
-  In 1-2 sentences, state whether a ClickHouse MCP tool was called in this trace and whether the assistant's final response makes specific factual claims that depend on database results.
-  ```
+Pick **Observations** and leave **Run on live incoming observations** on.
 
-- **Category selection prompt:** leave default
+![Run on Observations](../../images/database-grounded-03-run-on-observations.png)
 
-![Score type and categories](../../images/05-score-type-categories.png)
-
-### 6. Run on Observations
-
-Pick **Observations** as the target (Traces is now marked *Legacy*). We evaluate observations because, on the current LibreChat trace structure, the full message thread lives on a specific observation — not on the trace `output`, which is now just the assistant's final answer string. Leave **Run on live incoming observations** on.
-
-![Run on Observations](../../images/06-run-on-traces.png)
-
-### 7. Filter to the `LangGraph` span
+### 5. Filter to the `LangGraph` span
 
 - Filter: **Name = any of → `LangGraph`**
 
-Each `AgentRun` trace contains exactly one `LangGraph` span, and its `output` is the complete message thread (assistant messages with `tool_calls`, plus tool-result messages). The preview confirms the match. Because only `AgentRun` traces have a `LangGraph` span, this also skips the `TitleRun` traces that just generate session titles — one score per trace, same as before.
+The `LangGraph` span's `output` is the full message thread the code parses. One span per `AgentRun` trace, so one score per trace — and because only `AgentRun` traces have a `LangGraph` span, this skips the `TitleRun` traces.
 
-![Filter to LangGraph](../../images/07-filter-trace-name.png)
+![Filter to LangGraph](../../images/database-grounded-04-filter-langgraph.png)
 
-Sampling 100% is fine for a workshop project; lower it for production cost control.
+### 6. Test before saving
 
-### 8. Map variables
+Use **Test** to run the evaluator against a sampled matching observation and confirm the score. The preview shows the `ctx` the code receives — note `toolCalls` is an empty list here, which is why the code parses `observation.output` (the message thread) rather than relying on `ctx.observation.tool_calls`.
 
-Map the prompt's `{{conversation}}` variable to the observation's **output** field. The `LangGraph` span's `output` is the full message thread including any `tool_calls`, so this one mapping gives the judge everything it needs.
+![Test run](../../images/database-grounded-05-test.png)
 
-| Variable | Source | Field |
-|---|---|---|
-| `conversation` | Observation | `output` |
-
-![Variable mapping](../../images/08-variable-mapping.png)
-
-Save → the evaluator runs on the `LangGraph` span of every new `AgentRun` trace.
+Save → the evaluator scores the `LangGraph` span of every new `AgentRun` trace.
 
 ---
 
-## Why the `LangGraph` span `output`
+## Why parse the thread instead of `ctx.observation.tool_calls`
 
-On the current (OTel SDK v5) trace structure, the trace-level `input`/`output` are plain strings — just the user's question and the assistant's final answer — and each tool call is its own `TOOL` observation. An LLM-as-a-Judge maps variables from a **single** object and can't reach sibling observations, so a plain-string mapping would leave the judge blind to whether a tool ran.
+`ctx.observation.tool_calls` reflects calls recorded directly on the target observation — for the `LangGraph` span that's empty (see the test preview). The tool calls live inside the span's `output` message thread: assistant messages carry a `tool_calls` array, and each tool result is a message whose `role` is the tool name (e.g. `run_select_query_mcp_ClickHouse-Cloud`). Parsing the thread — scoped to the current turn — is the reliable source.
 
-The `LangGraph` span is the one observation that still carries the whole thread in its `output`: assistant messages with a `tool_calls` array, and tool-result messages whose `role` is the tool name (e.g. `run_select_query_mcp_ClickHouse-Cloud`). Mapping that one field lets the judge see in one pass whether a `*_mcp_ClickHouse-Cloud` tool was actually invoked.
+## Pairing with `on-topic`
+
+`database-grounded` × [`on-topic`](../on-topic/) together surface the highest-value failure case — a question the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](../on-topic/setup.md) for the full pairing table.

@@ -9,15 +9,17 @@ Reads the user's messages and labels their emotional state. Catches frustration 
 
 ## Visual walkthrough
 
-> Same flow as [`database-grounded/setup.md`](../database-grounded/setup.md). The differences: the name, the prompt, the category labels, and the target — this evaluator maps the root **`AgentRun` observation's `input`** (the user's message), not the `LangGraph` span. Walkthrough below shows just the screens you'll see for this one.
+> Same **LLM-as-a-judge** flow as [`on-topic/setup.md`](../on-topic/setup.md) (the canonical walkthrough). The differences: the name, the prompt, and the category labels. Like `on-topic`, this evaluator maps the root **`AgentRun` observation's `input`** (the user's message). Walkthrough below shows just the screens you'll see for this one.
 
 ### 1. Open Evaluators → + Set up evaluator
+
+Pick **LLM as a judge evaluator**. (The default judge model is already configured from the `on-topic` setup.)
 
 ![Set up evaluator](../../images/user-sentiment-01-set-up-evaluator.png)
 
 ### 2. Create a new custom evaluator
 
-`database-grounded` is in the list now — click **+ Create Custom Evaluator** to add this one.
+Click **+ Create Custom Evaluator** to add this one.
 
 ![Select evaluator → Create Custom](../../images/user-sentiment-02-select-evaluator.png)
 
