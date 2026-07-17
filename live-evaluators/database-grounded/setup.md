@@ -9,13 +9,13 @@ Detects whether the agent answered using a real ClickHouse Cloud MCP tool call (
 
 ## Visual walkthrough
 
-> The flow below is the canonical setup for this repo. `user-sentiment` and `on-topic` follow the exact same steps — only the **name**, the **prompt** (paste from each folder's `prompt.md`), and the **category labels** change. The pasteable values for each are in the respective `setup.md`.
+> The flow below is the canonical setup for this repo. `user-sentiment` and `on-topic` follow the same steps — they differ only in the **name**, the **prompt** (paste from each folder's `prompt.md`), the **category labels**, and the **target observation** (`user-sentiment`/`on-topic` map the root `AgentRun` observation's `input`; this one maps the `LangGraph` span's `output`). The per-evaluator deltas are in the respective `setup.md`.
 
-### 1. Open LLM-as-a-Judge
+### 1. Open Evaluators
 
-Sidebar → **Evaluation → LLM-as-a-Judge**.
+Sidebar → **Evaluation → Evaluators**. (This section was previously labelled "LLM-as-a-Judge".)
 
-![Sidebar: LLM-as-a-Judge](../../images/01-sidebar-llm-as-a-judge.png)
+![Sidebar: Evaluators](../../images/01-sidebar-llm-as-a-judge.png)
 
 ### 2. Set up evaluator
 
@@ -54,36 +54,38 @@ If no default model is set, the wizard blocks you here. Click **Set up** and add
 
 ![Score type and categories](../../images/05-score-type-categories.png)
 
-### 6. Run on Traces
+### 6. Run on Observations
 
-Pick **Traces (Legacy)** as the target. Observation evaluators are the newer pattern, but the trace-level `output` already contains the full message thread we need, so Traces is simpler for this workshop.
+Pick **Observations** as the target (Traces is now marked *Legacy*). We evaluate observations because, on the current LibreChat trace structure, the full message thread lives on a specific observation — not on the trace `output`, which is now just the assistant's final answer string. Leave **Run on live incoming observations** on.
 
-![Run on Traces](../../images/06-run-on-traces.png)
+![Run on Observations](../../images/06-run-on-traces.png)
 
-### 7. Filter to `AgentRun`
+### 7. Filter to the `LangGraph` span
 
-- Filter: **Name = any of → `AgentRun`**
+- Filter: **Name = any of → `LangGraph`**
 
-The preview confirms which traces will match — this skips the `TitleRun` traces that only generate session titles.
+Each `AgentRun` trace contains exactly one `LangGraph` span, and its `output` is the complete message thread (assistant messages with `tool_calls`, plus tool-result messages). The preview confirms the match. Because only `AgentRun` traces have a `LangGraph` span, this also skips the `TitleRun` traces that just generate session titles — one score per trace, same as before.
 
-![Filter to AgentRun](../../images/07-filter-trace-name.png)
+![Filter to LangGraph](../../images/07-filter-trace-name.png)
 
-Optional: enable backfill if you want existing traces scored too. Sampling 100% is fine for a workshop project; lower it for production cost control.
+Sampling 100% is fine for a workshop project; lower it for production cost control.
 
 ### 8. Map variables
 
-Map the prompt's `{{conversation}}` variable to the trace's **output** field. The trace output contains the full LangGraph message thread including any `tool_calls`, so this one mapping gives the judge everything it needs.
+Map the prompt's `{{conversation}}` variable to the observation's **output** field. The `LangGraph` span's `output` is the full message thread including any `tool_calls`, so this one mapping gives the judge everything it needs.
 
 | Variable | Source | Field |
 |---|---|---|
-| `conversation` | Trace | `output` |
+| `conversation` | Observation | `output` |
 
 ![Variable mapping](../../images/08-variable-mapping.png)
 
-Save → the evaluator runs on every new `AgentRun` trace.
+Save → the evaluator runs on the `LangGraph` span of every new `AgentRun` trace.
 
 ---
 
-## Why trace `output`
+## Why the `LangGraph` span `output`
 
-The trace `output` field contains the full LangGraph message thread including any `tool_calls` and tool result messages. The judge can see in one pass whether a `*_mcp_ClickHouse-Cloud` tool was actually invoked, so a single variable is enough.
+On the current (OTel SDK v5) trace structure, the trace-level `input`/`output` are plain strings — just the user's question and the assistant's final answer — and each tool call is its own `TOOL` observation. An LLM-as-a-Judge maps variables from a **single** object and can't reach sibling observations, so a plain-string mapping would leave the judge blind to whether a tool ran.
+
+The `LangGraph` span is the one observation that still carries the whole thread in its `output`: assistant messages with a `tool_calls` array, and tool-result messages whose `role` is the tool name (e.g. `run_select_query_mcp_ClickHouse-Cloud`). Mapping that one field lets the judge see in one pass whether a `*_mcp_ClickHouse-Cloud` tool was actually invoked.

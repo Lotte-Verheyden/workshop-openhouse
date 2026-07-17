@@ -1,14 +1,12 @@
-You are evaluating the sentiment of the USER across the conversation. Judge only the user's messages, not the assistant's responses.
+You are evaluating the sentiment of the user, based on their message to a ClickHouse data agent.
 
-Conversation:
-{{conversation}}
-
-Look at all messages with role=user. Weight the most recent user messages more heavily — they reflect the user's current state after seeing the agent's responses.
+User message:
+{{message}}
 
 Signals to look for:
-- positive: thanks, praise, expressed satisfaction, enthusiasm ("great", "perfect", "exactly what I needed"), continued engagement on the agent's terms
-- negative: frustration, annoyance, repeated clarifications, pushback ("no that's not what I asked", "you're wrong", "this isn't working"), terse one-word replies after a poor answer, sarcasm, complaints about the agent's behavior, escalation in tone
-- neutral: factual follow-ups, additional questions, no clear emotional signal
+- positive: thanks, praise, expressed satisfaction, enthusiasm ("great", "perfect", "exactly what I needed").
+- negative: frustration, annoyance, pushback ("no that's not what I asked", "you're wrong", "this isn't working"), terse dismissive replies, sarcasm, complaints, escalation in tone.
+- neutral: factual questions or requests with no clear emotional signal.
 
 Classify as exactly one of:
 - `positive`

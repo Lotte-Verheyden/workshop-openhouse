@@ -5,7 +5,7 @@ How to run an experiment in Langfuse against the [`out-of-scope-questions`](../d
 Prerequisites:
 
 - [`out-of-scope-questions`](../datasets/setup.md) dataset uploaded
-- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version). For a simple starting point, the prompt can just contain `{{conversation}}` as its only variable — the dataset item's input fills it in at run time.
+- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version). For a simple starting point, the prompt can just contain `{{question}}` as its only variable (matching the dataset's `input` column) — the dataset item's input fills it in at run time.
 
 ## 1. Set up the evaluator
 
@@ -50,7 +50,7 @@ Langfuse validates that the prompt's `{{variables}}` match dataset columns. With
 
 ## 7. Evaluators
 
-Open the dropdown and tick **`deferred-the-question`**. Leave the others unticked — they're configured as live-trace evaluators and aren't relevant to the offline scope-stress test.
+Open the dropdown and tick **`deferred-the-question`**. Leave the others unticked — they're configured as live-observation evaluators and aren't relevant to the offline scope-stress test.
 
 ![Select evaluators](../images/experiment-run-06-evaluators.png)
 

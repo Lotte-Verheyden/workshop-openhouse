@@ -5,13 +5,13 @@ Judges whether the user's question is something the ClickHouse MCP agent should 
 ## Use
 
 - **Live monitoring:** ✅
-- **Offline experiments:** ✅ (only needs the question and the response, both available in any experiment trace)
+- **Offline experiments:** ✅ (only needs the question — map `{{question}}` to the experiment item's `input`)
 
 ## Visual walkthrough
 
-> Same 8 steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Only the name, prompt, and category labels change. Walkthrough below shows just the screens you'll see for this one.
+> Same flow as [`database-grounded/setup.md`](../database-grounded/setup.md). The differences: the name, the prompt, the category labels, and the target — this evaluator maps the root **`AgentRun` observation's `input`** (just the user's question), not the `LangGraph` span. Walkthrough below shows just the screens you'll see for this one.
 
-### 1. Open LLM-as-a-Judge → + Set up evaluator
+### 1. Open Evaluators → + Set up evaluator
 
 LLM connection is already configured from the `database-grounded` setup, so no default-model warning this time.
 
@@ -37,33 +37,34 @@ LLM connection is already configured from the `database-grounded` setup, so no d
 - **Score reasoning prompt** (optional):
 
   ```
-  In one sentence, identify the final user question and explain whether the ClickHouse Cloud MCP tools can plausibly answer it.
+  In one sentence, identify the user question and explain whether the ClickHouse Cloud MCP tools can plausibly answer it.
   ```
 
 ![Categories: on_topic / ambiguous / off_topic](../../images/on-topic-04-categories.png)
 
-### 5. Run on Traces
+### 5. Run on Observations
 
-**Traces (Legacy)**, same as before.
+Pick **Observations** (same as `database-grounded`).
 
-![Run on Traces](../../images/on-topic-05-run-on-traces.png)
+![Run on Observations](../../images/on-topic-05-run-on-traces.png)
 
 ### 6. Filter, sampling, delay
 
-- **Evaluate:** check both **New traces** and **Existing traces** (backfill the 17 traces already in the project)
-- **Filter:** `Name = any of → AgentRun`
+- **Filter:** `Name = any of → AgentRun` — this matches the root **`AgentRun` observation** (the agent run's overall request/response), whose `input` is the user's question.
 - **Sampling:** 100%
-- **Delay:** 30s (default — gives ingestion time to finish before the judge reads the trace)
+- **Delay:** 30s (default — gives ingestion time to finish before the judge reads the observation)
 
 ![Filter and sampling](../../images/on-topic-06-filter-sampling.png)
 
+> The filter screenshot above still shows the older trace-level view (the `New/Existing traces` toggles and trace preview); the filter value `Name = AgentRun` is unchanged and is what matters. Note that only new-format traces have an `AgentRun` observation, so backfilling older traces won't score them.
+
 ### 7. Variable mapping
+
+This evaluator only judges the question, so map the single `{{question}}` variable to the `AgentRun` observation's `input`:
 
 | Variable | Source | Field |
 |---|---|---|
-| `conversation` | Trace | `output` |
-
-Same as `database-grounded` — the trace `output` contains the full message thread, which is all the judge needs.
+| `question` | Observation | `input` |
 
 ![Variable mapping](../../images/on-topic-07-variable-mapping.png)
 

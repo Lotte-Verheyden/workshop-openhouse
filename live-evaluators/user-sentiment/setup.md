@@ -9,9 +9,9 @@ Reads the user's messages and labels their emotional state. Catches frustration 
 
 ## Visual walkthrough
 
-> Same 8 steps as [`database-grounded/setup.md`](../database-grounded/setup.md). Only the name, prompt, and category labels change. Walkthrough below shows just the screens you'll see for this one.
+> Same flow as [`database-grounded/setup.md`](../database-grounded/setup.md). The differences: the name, the prompt, the category labels, and the target — this evaluator maps the root **`AgentRun` observation's `input`** (the user's message), not the `LangGraph` span. Walkthrough below shows just the screens you'll see for this one.
 
-### 1. Open LLM-as-a-Judge → + Set up evaluator
+### 1. Open Evaluators → + Set up evaluator
 
 ![Set up evaluator](../../images/user-sentiment-01-set-up-evaluator.png)
 
@@ -40,38 +40,36 @@ Reads the user's messages and labels their emotional state. Catches frustration 
 
 ![Categories: positive / neutral / negative](../../images/user-sentiment-04-categories.png)
 
-### 5. Skip Experiments — pick Traces
+### 5. Run on Observations (not Experiments)
 
-The wizard offers **Experiments** as a target. **Skip it for this evaluator.** An experiment has no real user reacting — there's no sentiment to score.
+Pick **Observations**. The wizard also offers **Experiments** — **skip that for this evaluator**: an experiment has no real user reacting, so there's no sentiment to score.
 
-![Experiments tab — don't pick this](../../images/user-sentiment-05-experiments-tab.png)
+![Run on Observations](../../images/user-sentiment-06-run-on-traces.png)
 
-### 6. Run on Traces
+### 6. Filter, sampling, delay
 
-**Traces (Legacy)**, **New traces** + **Existing traces** both checked.
-
-![Run on Traces](../../images/user-sentiment-06-run-on-traces.png)
-
-### 7. Filter, sampling, delay
-
-- **Filter:** `Name = any of → AgentRun`
+- **Filter:** `Name = any of → AgentRun` — matches the root **`AgentRun` observation**, whose `input` is the user's message.
 - **Sampling:** 100%
 - **Delay:** 30s (default)
 
 ![Filter and sampling](../../images/user-sentiment-07-filter-sampling.png)
 
-### 8. Variable mapping
+> The filter screenshot above still shows the older trace-level view; the filter value `Name = AgentRun` is what matters. Only new-format traces have an `AgentRun` observation, so backfilling older traces won't score them.
+
+### 7. Variable mapping
+
+Map the single `{{message}}` variable to the `AgentRun` observation's `input`:
 
 | Variable | Source | Field |
 |---|---|---|
-| `conversation` | Trace | `output` |
+| `message` | Observation | `input` |
 
-The Langfuse UI also shows a live preview of the prompt with one matched trace's data filled in — useful sanity check before saving.
+The Langfuse UI also shows a live preview of the prompt with one matched observation's data filled in — useful sanity check before saving.
 
 ![Variable mapping with prompt preview](../../images/user-sentiment-08-variable-mapping.png)
 
 ---
 
-## Note on multi-turn traces
+## Note on single-turn scoring
 
-The trace `output` contains the full session-to-date message thread. Every `AgentRun` in a session re-scores sentiment across all earlier turns — usually what you want (sentiment trend per session). To score only the latest user turn, change the prompt to "judge only the FINAL user message."
+The `AgentRun` observation's `input` is the user's message for **that turn**, so this evaluator scores one user turn per trace. That's the honest signal available from a single observation — an observation-level judge can't see sibling turns. For a genuine sentiment *trend* across a whole conversation you'd aggregate at the **session** level, which is out of scope for this per-observation evaluator.

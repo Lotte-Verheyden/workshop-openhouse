@@ -5,10 +5,8 @@ About the agent:
 - It is NOT a general-knowledge assistant, a coding assistant, or a chatbot.
 - Tool names look like `*_mcp_ClickHouse-Cloud` (e.g. `get_organizations_mcp_ClickHouse-Cloud`, `list_databases_mcp_ClickHouse-Cloud`, `run_select_query_mcp_ClickHouse-Cloud`).
 
-Conversation:
-{{conversation}}
-
-Find the final user question (the last message with role=user). Ignore the assistant's response — judge only the question.
+User question:
+{{question}}
 
 Classify the question as exactly one of:
 
