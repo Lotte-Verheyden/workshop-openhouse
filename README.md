@@ -11,6 +11,8 @@ The repo follows the same four-step arc as the workshop — the Langfuse [**AI E
 
 Some steps point at content in this repo; others just describe what should already be in place before the next step.
 
+> **Note:** The UI screenshots and walkthroughs are based on **Langfuse Cloud**. If you're on a self-hosted or older version, the UI might look slightly different — the underlying concepts still apply.
+
 ---
 
 ## 1. Trace

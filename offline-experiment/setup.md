@@ -5,23 +5,23 @@ How to run an experiment in Langfuse against the [`out-of-scope-questions`](../d
 Prerequisites:
 
 - [`out-of-scope-questions`](../datasets/setup.md) dataset uploaded
-- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version). For a simple starting point, the prompt can just contain `{{conversation}}` as its only variable — the dataset item's input fills it in at run time.
+- The agent's system prompt saved in Langfuse Prompts (so it can be selected by name and version). For a simple starting point, the prompt can just contain `{{question}}` as its only variable (matching the dataset's `input` column) — the dataset item's input fills it in at run time.
 
 ## 1. Set up the evaluator
 
 Create the `deferred-the-question` evaluator (boolean, target: Experiments). Full walkthrough in [`deferred-the-question/setup.md`](./deferred-the-question/setup.md). Come back here once it's saved.
 
-## 2. Open the dataset
+## 2. Open Experiments
 
-Sidebar → **Evaluation → Datasets** → click `out-of-scope-questions`.
+Sidebar → **Evaluation → Experiments**. (You now start an experiment from here — you'll pick the dataset inside the run modal in a later step.)
 
-![Sidebar: Datasets](../images/experiment-run-01-sidebar.png)
+![Sidebar: Experiments](../images/experiment-run-01-sidebar.png)
 
 ## 3. Run experiment
 
-Top right of the dataset page → **Run experiment**.
+Top right of the Experiments page → **Run experiment**.
 
-![Dataset header with Run experiment](../images/experiment-run-02-dataset-header.png)
+![Experiments header with Run experiment](../images/experiment-run-02-dataset-header.png)
 
 ## 4. Pick UI mode
 
@@ -50,7 +50,7 @@ Langfuse validates that the prompt's `{{variables}}` match dataset columns. With
 
 ## 7. Evaluators
 
-Open the dropdown and tick **`deferred-the-question`**. Leave the others unticked — they're configured as live-trace evaluators and aren't relevant to the offline scope-stress test.
+Open the dropdown and tick **`deferred-the-question`**. Leave the others unticked — they're configured as live-observation evaluators and aren't relevant to the offline scope-stress test.
 
 ![Select evaluators](../images/experiment-run-06-evaluators.png)
 
