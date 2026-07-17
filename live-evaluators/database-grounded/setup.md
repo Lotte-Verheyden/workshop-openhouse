@@ -2,6 +2,8 @@
 
 Detects whether the agent answered using a real ClickHouse Cloud MCP tool call (grounded) or fabricated specifics from background knowledge (hallucinated).
 
+> Prefer a deterministic check? [`database-grounded-code`](../database-grounded-code/) answers "did a ClickHouse tool run this turn?" with a code evaluator — no model, free, reproducible. Use this LLM version when you also want a semantic judgment of whether the response's claims are actually supported.
+
 ## Use
 
 - **Live monitoring:** ✅

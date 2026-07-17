@@ -38,7 +38,13 @@ Each folder contains:
 - `prompt.md` — the evaluator prompt (paste into Langfuse)
 - `setup.md` — UI configuration steps
 
-**Start here:** [`live-evaluators/database-grounded/setup.md`](./live-evaluators/database-grounded/setup.md) has the full visual walkthrough. The other two evaluators follow the same flow — only name, prompt, and category labels change. Their `setup.md` files document those per-evaluator deltas.
+There's also a deterministic, **code-based** variant of the first one:
+
+| Name | What it catches |
+|---|---|
+| [`database-grounded` (code)](./live-evaluators/database-grounded-code/) | Same signal without an LLM — inspects the trace to see whether a ClickHouse tool actually ran *this turn* |
+
+**Start here:** [`live-evaluators/database-grounded/setup.md`](./live-evaluators/database-grounded/setup.md) has the full visual walkthrough. The other two evaluators follow the same flow — only name, prompt, and category labels change. Their `setup.md` files document those per-evaluator deltas. For the code-based version, see [`database-grounded-code/setup.md`](./live-evaluators/database-grounded-code/setup.md).
 
 **Pairing:** `database-grounded` × `on-topic` together surface the highest-value failure case — questions the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](./live-evaluators/on-topic/setup.md) for the full pairing table.
 
