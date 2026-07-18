@@ -9,11 +9,11 @@ Boolean evaluator that checks whether the agent refused / redirected an off-topi
 
 ## Visual walkthrough
 
-> Same first two steps as [`database-grounded/setup.md`](../../live-evaluators/database-grounded/setup.md). Differences for this one: **score type = Boolean**, **target = Experiments**, **two variables** instead of one.
+> Same **LLM-as-a-judge** first steps as [`on-topic/setup.md`](../../live-evaluators/on-topic/setup.md) (the canonical walkthrough). Differences for this one: **score type = Boolean**, **target = Experiments**, **two variables** instead of one.
 
 ### 1. Open Evaluators → + Set up evaluator
 
-Same as the other evaluators.
+Pick **LLM as a judge evaluator**, same as the other LLM evaluators.
 
 ![Set up evaluator](../../images/user-sentiment-01-set-up-evaluator.png)
 

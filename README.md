@@ -25,20 +25,17 @@ Capture every agent request as a Langfuse trace: prompts, tool calls, generation
 
 ## 2. Monitor
 
-Three LLM-as-a-judge evaluators that run on every new live agent trace. Each one targets a different failure mode.
+Three evaluators that run on every new live agent trace. Each one targets a different failure mode.
 
-| Name | What it catches |
-|---|---|
-| [`database-grounded`](./live-evaluators/database-grounded/) | Hallucinated specifics — confident numbers with no DB tool call |
-| [`user-sentiment`](./live-evaluators/user-sentiment/) | Frustration, confusion, pushback in the user's messages |
-| [`on-topic`](./live-evaluators/on-topic/) | Scope drift — agent answering questions outside its remit instead of deferring |
+| Name | Type | What it catches |
+|---|---|---|
+| [`database-grounded`](./live-evaluators/database-grounded/) | Code | Confident specifics with no DB query this turn — inspects the trace to see whether a ClickHouse tool actually ran |
+| [`user-sentiment`](./live-evaluators/user-sentiment/) | LLM judge | Frustration, confusion, pushback in the user's messages |
+| [`on-topic`](./live-evaluators/on-topic/) | LLM judge | Scope drift — agent answering questions outside its remit instead of deferring |
 
-Each folder contains:
+`database-grounded` is a deterministic **code evaluator** (`evaluator.py`); the other two are **LLM-as-a-judge** evaluators (`prompt.md`). Each folder also has a `setup.md` with the UI configuration steps.
 
-- `prompt.md` — the evaluator prompt (paste into Langfuse)
-- `setup.md` — UI configuration steps
-
-**Start here:** [`live-evaluators/database-grounded/setup.md`](./live-evaluators/database-grounded/setup.md) has the full visual walkthrough. The other two evaluators follow the same flow — only name, prompt, and category labels change. Their `setup.md` files document those per-evaluator deltas.
+**Start here:** [`live-evaluators/database-grounded/setup.md`](./live-evaluators/database-grounded/setup.md) walks the code evaluator. For the LLM-as-a-judge flow, [`on-topic/setup.md`](./live-evaluators/on-topic/setup.md) is the canonical walkthrough — `user-sentiment` follows the same steps and documents only its deltas.
 
 **Pairing:** `database-grounded` × `on-topic` together surface the highest-value failure case — questions the agent should have answered with data, but instead made up. See [`on-topic/setup.md`](./live-evaluators/on-topic/setup.md) for the full pairing table.
 

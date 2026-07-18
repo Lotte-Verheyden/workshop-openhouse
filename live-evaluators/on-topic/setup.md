@@ -9,28 +9,34 @@ Judges whether the user's question is something the ClickHouse MCP agent should 
 
 ## Visual walkthrough
 
-> Same flow as [`database-grounded/setup.md`](../database-grounded/setup.md). The differences: the name, the prompt, the category labels, and the target — this evaluator maps the root **`AgentRun` observation's `input`** (just the user's question), not the `LangGraph` span. Walkthrough below shows just the screens you'll see for this one.
+> This is the canonical **LLM-as-a-judge** walkthrough for the repo. `user-sentiment` follows the same flow — only the name, prompt, and category labels change. (`database-grounded` is a [code evaluator](../database-grounded/) — a different setup.) This evaluator maps the root **`AgentRun` observation's `input`** — just the user's question.
 
 ### 1. Open Evaluators → + Set up evaluator
 
-LLM connection is already configured from the `database-grounded` setup, so no default-model warning this time.
+Sidebar → **Evaluation → Evaluators → + Set up evaluator**, then under **Create from scratch** pick **LLM as a judge evaluator**.
 
 ![Set up evaluator](../../images/on-topic-01-set-up-evaluator.png)
 
-### 2. Create a new custom evaluator
+### 2. Configure a default judge model (one-time)
 
-`database-grounded` shows up in the list now — ignore it and click **+ Create Custom Evaluator**.
+If no default model is set yet, the wizard asks you to add one. Click **Set up** and add an LLM connection (any model with structured-output support — `gpt-4o-mini` and `claude-haiku-4-5` are cheap defaults). Later LLM evaluators reuse this connection.
+
+![Default model warning](../../images/03-default-model.png)
+
+### 3. Create a custom evaluator
+
+Click **+ Create Custom Evaluator**.
 
 ![Select evaluator → Create Custom](../../images/on-topic-02-select-evaluator.png)
 
-### 3. Name and prompt
+### 4. Name and prompt
 
 - **Name:** `on-topic`
 - **Prompt:** paste from [`prompt.md`](./prompt.md)
 
 ![Create evaluator form](../../images/on-topic-03-create-form.png)
 
-### 4. Score type and categories
+### 5. Score type and categories
 
 - **Score type:** Categorical
 - **Categories:** `on_topic`, `ambiguous`, `off_topic`
@@ -42,13 +48,13 @@ LLM connection is already configured from the `database-grounded` setup, so no d
 
 ![Categories: on_topic / ambiguous / off_topic](../../images/on-topic-04-categories.png)
 
-### 5. Run on Observations
+### 6. Run on Observations
 
-Pick **Observations** (same as `database-grounded`).
+Pick **Observations**.
 
 ![Run on Observations](../../images/on-topic-05-run-on-traces.png)
 
-### 6. Filter, sampling, delay
+### 7. Filter, sampling, delay
 
 - **Filter:** `Name = any of → AgentRun` — this matches the root **`AgentRun` observation** (the agent run's overall request/response), whose `input` is the user's question.
 - **Sampling:** 100%
@@ -58,7 +64,7 @@ Pick **Observations** (same as `database-grounded`).
 
 > The filter screenshot above still shows the older trace-level view (the `New/Existing traces` toggles and trace preview); the filter value `Name = AgentRun` is unchanged and is what matters. Note that only new-format traces have an `AgentRun` observation, so backfilling older traces won't score them.
 
-### 7. Variable mapping
+### 8. Variable mapping
 
 This evaluator only judges the question, so map the single `{{question}}` variable to the `AgentRun` observation's `input`:
 
@@ -72,15 +78,17 @@ This evaluator only judges the question, so map the single `{{question}}` variab
 
 ## Also attach to experiments
 
-`on-topic` is the only one of the three that travels cleanly from live → offline. When you run a dataset experiment (e.g. scope-stress questions against a candidate system prompt), attach this evaluator to the experiment run so each generated output gets scored automatically.
+`on-topic` travels cleanly from live → offline. When you run a dataset experiment (e.g. scope-stress questions against a candidate system prompt), attach this evaluator to the experiment run so each generated output gets scored automatically.
 
 ## Pairing with `database-grounded`
 
+The [`database-grounded`](../database-grounded/) code evaluator scores `grounded` / `metadata_only` / `no_tool_call`. Crossed with `on-topic`:
+
 | `on-topic` | `database-grounded` | meaning |
 |---|---|---|
-| `on_topic` | `grounded` | ✅ ideal — agent did its job |
-| `on_topic` | `potentially_hallucinated` | 🚨 real bug — should have queried DB |
-| `on_topic` | `no_data_required` | usually fine — clarifying, planning |
-| `off_topic` | `no_data_required` | ✅ correct refusal |
-| `off_topic` | `grounded` | weird — agent over-eager to query |
+| `on_topic` | `grounded` | ✅ ideal — agent queried and answered |
+| `on_topic` | `no_tool_call` | 🚨 real bug — should have queried the DB but answered without it |
+| `on_topic` | `metadata_only` | inspected schema/listings but ran no data query — often an incomplete answer |
+| `off_topic` | `no_tool_call` | ✅ correct refusal — didn't query for an off-topic question |
+| `off_topic` | `grounded` | weird — agent queried for an off-topic question |
 | `ambiguous` | any | agent should have asked to clarify |
